@@ -8,6 +8,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import LoginValidation from "./loginValidation";
 import Dyanamicform from "./dyanamicform";
 
+
  function UserData(props) {
   const navigate=useNavigate();
   console.log(props,"sivaprakash")
@@ -298,6 +299,7 @@ import Dyanamicform from "./dyanamicform";
       </div>
       <div>
         <button onClick={()=>navigate("/dyanamicform")}>Dyanamic Form</button>
+        <button onClick={()=>navigate("/formDataDisplay")}>Dyanamic Form Data</button>
         {/* {console.log(profile[0]?._id,"sathish")} */}
         <p>User:{profile?profile[0]?.firstName:"hello"}</p>
         <p>UserRole:{profile?profile[0]?.role:"hello"}</p>

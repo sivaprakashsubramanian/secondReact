@@ -4,6 +4,7 @@ import LoginValidation from './loginValidation'
 import UserData from './userData'
 import RegisterUser from './registerUser'
 import Dyanamicform from './dyanamicform'
+import FormDataDisplay from './formDataDisplay'
 
 function Noderoutes() {
     const [isLogIn,setIsLogIn]=useState(false)
@@ -42,11 +43,12 @@ function Noderoutes() {
       <Route path="/userData" element={<Navigate to="/"/>} />
     )}
     <Route exact path="/registerUser" element={<RegisterUser/>}></Route>
-    <Route exact path="/dyanamicform" element={<Dyanamicform/>}></Route>
+    <Route exact path="/dyanamicform" element={<Dyanamicform userId={userId}  userRole={userRole}/>}></Route>
+    <Route exact path="/formDataDisplay" element={<FormDataDisplay/>}></Route>
   </Routes>
 </BrowserRouter>
     {
-      // console.log(userId,"siva[]]]][[")
+      console.log(userRole,"siva[]]]][[")
     }
     </div>
     

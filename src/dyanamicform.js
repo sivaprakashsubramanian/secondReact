@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import { Button, Modal } from "antd";
+import axios from "axios";
 
-function Dyanamicform() {
+function Dyanamicform(props) {
   const [inputType, setInputType] = useState([]);
   const [editModal, setEditModal] = useState(false);
   const [delModal, setDelModal] = useState(false);
   const [typeData, setTypeData] = useState();
-  const [editAddOption,setEditAddOption]=useState();
-  const [formIndex, setFormIndex] = useState({
-    editDataIndex: "",
-    delDataIndex: "",
+  const [formName,setFormName]=useState({
+    name:""
   });
+  const [formIndex,setFormIndex]=useState(0)
+  const [editAddOption,setEditAddOption]=useState();
+  const [editDataIndex,setEditDataIndex]=useState();
+  const [delDataIndex,setDelDataIndex]=useState();
+  // const [formIndex, setFormIndex] = useState({
+  //   editDataIndex: 0,
+  //   delDataIndex: "",
+  // });
   const [formData, setFormData] = useState({
     label: "",
     placeHolder: "",
@@ -41,19 +48,24 @@ function Dyanamicform() {
     if (name === "text") {
       const outputArr = [...inputType, { type: "text",label:"",placeHolder:""}];
       setInputType(outputArr);
+      // setEditAddOption(outputArr);
     } else if (name === "select") {
       const outputArr = [...inputType, { type: "select",label:"",arr:["option1","option2"]}];
       setInputType(outputArr);
+      // setEditAddOption(outputArr);
     } else if (name === "radio") {
       const outputArr = [...inputType, { type: "radio",label:"",arr:["male","female"]}];
       setInputType(outputArr);
+      // setEditAddOption(outputArr);
     } else if (name === "checkbox") {
       const outputArr = [...inputType, { type: "checkbox",label:"",arr:["Yes","No"]}];
       setInputType(outputArr);
+      // setEditAddOption(outputArr);
     }
-    // console.log("sathish")
   };
-  console.log(editModal, "qwedsa");
+  console.log(props.userId.firstName,"props")
+  // console.log(editModal, "qwedsa");
+  console.log(editAddOption, "modal");
   const formAddData = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -64,31 +76,51 @@ function Dyanamicform() {
   let Data=[];
   
   const addOptions=()=>{
-    // console.log(inputType[formIndex.editDataIndex],"first")
+    console.log(editAddOption,"first")
     // setEditAddOption([inputType[formIndex.editDataIndex]])
-    console.log(editAddOption[0]?.arr,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
-    Data=[...editAddOption[0]?.arr,"new option"]
-    console.log(Data,"Data")
-    setEditAddOption([Data]);
-    console.log(editAddOption[0].arr,"DataEdited")
+    // console.log(editAddOption[0].arr,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
+    // console.log(inputType,editDataIndex,"qwerty")
+    // Data=[...inputType]
+    // console.log(Data[editDataIndex],"1")
+    // Data[editDataIndex]=[Data[editDataIndex],Data[editDataIndex].arr.push("new option")]
+    // console.log(data)
+    // console.log(Data,"Data")
+    // setEditAddOption(Data);
+    // editAddOption[0].arr=[...Data]
+   // editAddOption[editDataIndex]=Data
     
+    // setEditAddOption(Data);
+    // console.log(editAddOption,"DataEdited")
+    const updatedOptions = [...editAddOption.arr, "New Option"];
+  setEditAddOption((prevType) => ({ ...prevType, arr: updatedOptions }));
+  console.log(editAddOption,"addoptions")
+
 
     
      
     // inputType[formIndex.editDataIndex].arr=[...Data];
     // console.log(inputType[formIndex.editDataIndex]?.arr,"dddddddddddddddaaaaaaa")
     // console.log(inputType,"qwertyuio")
-    // setUpdateData(editAddOption?.arr)
+    // 
 
   }
+  console.log(Data,"mmmmmmmmmm")
   // console.log(Data,"zzzzzzssssss")
   // console.log(updateData,"zxcvvbnm,mnbvcxcvbnbvcx")
+ 
   const updateFormData = () => {
     // console.log(Data, "hole data");
     // inputType[formIndex.editDataIndex].arr=[...Data];
     // console.log(inputType[formIndex.editDataIndex].arr,"aaaaaaaaaaaaaaaaaaaaaa")
-    console.log(editAddOption,"editaddoptions")
-    inputType[formIndex.editDataIndex]={type:typeData,label:formData.label,placeHolder:formData.placeHolder,arr:updateData}
+    // console.log(editAddOption,"editaddoptions")
+    // setUpdateData(editAddOption[editDataIndex]?.arr)
+
+    // console.log(editAddOption[0]?.arr,"vengatesan")
+    inputType[editDataIndex]={type:typeData,label:formData.label,placeHolder:formData.placeHolder,arr:editAddOption.arr}
+    setFormData({
+      label: "",
+      placeHolder: "",
+    });
     // inputType[formIndex.editDataIndex].arr=editAddOption[formIndex.editDataIndex].arr;
     // setDisplay({formData});
     // console.log(display,"nnnnnnnnnnnnnnnnnnnnnnnnnnnn")
@@ -147,83 +179,54 @@ function Dyanamicform() {
     const DeletArr = [...inputType];
     // console.log(formIndex?.delDataIndex,"index of del")
     // inputType[formIndex.editDataIndex]=inputType.splice(formIndex.editDataIndex,1);
-    if (!formIndex.delDataIndex.length)
-      DeletArr.splice(formIndex.delDataIndex, 1);
+    if (!delDataIndex.length)
+      DeletArr.splice(delDataIndex, 1);
 
     // console.log("jiii",DeletArr)
     setInputType([...DeletArr]);
   };
-  console.log(formIndex.editDataIndex, "modal");
-  console.log(formIndex.delDataIndex, "modal1111");
-  console.log(inputType[formIndex.editDataIndex]?.arr,"llllllllllllllllllll")
-const setEditData=()=>{
-  // console.log(formIndex,'kk')
-  // console.log(inputType[formIndex.editDataIndex],"mbvcxzasdfghjk")
-  setEditAddOption([inputType[formIndex.editDataIndex]])
-  // console.log(editAddOption,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
+ 
+  console.log(delDataIndex, "modal1111");
+  // console.log(inputType[editDataIndex]?.arr,"llllllllllllllllllll")
+  console.log(inputType[editDataIndex],'senthilkumar')
+// const setEditData=()=>{
+//   // console.log(formIndex,'kk')
+//   console.log(inputType[editDataIndex],"madhuuu")
+//   // setEditAddOption([inputType[editDataIndex]])
+//   console.log(editAddOption,"abina")
+//   console.log(inputType[editDataIndex],'senthilkumar')
+// }
+const handleFormname=(e)=>{
+  const{name,value}=e.target;
+  setFormName(value);
 }
+console.log(formName,"formName");
+const formBackend=()=>{
+  let time=new Date();
+  setFormIndex(formIndex+1);
+  console.log(formIndex,"indexesss")
+  const user=props.userId.firstName;
+  console.log(user,"123456")
+  axios.post("http://localhost:5000/form-post",{index:formIndex,formName:formName,formData:inputType,formUserName:user,formTime:time})
+  .then((res)=>{
+    console.log(res,"data get succesfully");
+  })
+  .catch((err)=>console.log(err,"err"))
+  
+// console.log(time.getDate())
+
+}
+
   return (
-    <div>
-      <Modal
-        open={editModal}
-        onCancel={modelClose}
-        onOk={() => {
-          modelClose();
-          updateFormData()
-        }}
-      >
-        {typeData === "text" ? (
-          <div>
-            Label
-            <input
-              name="label"
-              value={formData.label}
-              onChange={formAddData}
-              className="border border-black"
-            />
-            placeHolder
-            <input
-              name="placeHolder"
-              value={formData.placeHolder}
-              onChange={formAddData}
-              className="border border-black"
-            />
-          </div>
-        ) : (
-          <div>
-            Label
-            <input
-              name="label"
-              value={formData.label}
-              onChange={formAddData}
-              className="border border-black"
-            />
-            {inputType[formIndex.editDataIndex]?.arr.map((item,i)=>{
-              return(<div key={i}>{item}</div>)
-            })}
-            <Button type="primary" onClick={()=>addOptions()}>Add</Button>
-          </div>
-        )}
-        {/* Label<input name="label" value={formData.label} onChange={formAddData} className='border border-black'/>
-            placeHolder<input name="placeHolder" value={formData.placeHolder} onChange={formAddData} className='border border-black'/> */}
-      </Modal>
-      <Modal
-        open={delModal}
-        onCancel={delModalClose}
-        onOk={() => {
-          deleteFormData();
-          delModalClose();
-        }}
-      >
-        Data Deleted Successfully
-      </Modal>
+    <div className="flex justify-between">
+      <div>
       {input?.map((item, index) => {
         return (
           <div key={index}>
             {item?.name}
             <button
               className="p-2 border border-black"
-              onClick={() => handleSubmit(item.name)}
+              onClick={() => {console.log(item,"krishana");handleSubmit(item.name);}}
             >
               Add
             </button>
@@ -262,12 +265,13 @@ const setEditData=()=>{
               type="primary"
               onClick={() => {
                 modelOpen();
-                console.log(index)
-                setFormIndex({ ...formIndex,editDataIndex: index });
+                // console.log(index,"indexes")
+                setEditDataIndex(index);
+                // console.log(editDataIndex,'senthilkumar')
+                // console.log(item,"sivaprakash")
                 setTypeData(item.type)
-                // setEditAddOption([inputType[formIndex?.editDataIndex]])
-                setEditData()
-                console.log(item, "7777777777777");
+                // setOptions(item);
+                setEditAddOption(item);
               }}
             >
               Edit
@@ -275,7 +279,7 @@ const setEditData=()=>{
             <Button
               type="primary"
               onClick={() => {
-                setFormIndex({ delDataIndex: index });
+                setDelDataIndex(index);
                 delModalOpen();
               }}
             >
@@ -284,6 +288,64 @@ const setEditData=()=>{
           </div>
         );
       })}
+      <Modal
+        open={editModal}
+        onCancel={modelClose}
+        onOk={() => {
+          modelClose();
+          updateFormData()
+        }}
+      >{console.log(typeData,editAddOption,editDataIndex,"nnnnnnn")}
+        {typeData === "text" ? (
+          <div>
+            {console.log('llkkk')}
+            Label
+            <input
+              name="label"
+              value={formData.label}
+              onChange={formAddData}
+              className="border border-black"
+            />
+            placeHolder
+            <input
+              name="placeHolder"
+              value={formData.placeHolder}
+              onChange={formAddData}
+              className="border border-black"
+            />
+          </div>
+        ) : (
+          <div>{ console.log(editAddOption,'ll')}
+            Label
+            <input
+              name="label"
+              value={formData.label}
+              onChange={formAddData}
+              className="border border-black"
+            />
+            {editAddOption&&editAddOption.arr.map((item,i)=>{
+             
+              return(<div key={i}>{item}</div>)
+            })}
+            <Button type="primary" onClick={()=>addOptions()}>Add</Button>
+          </div>
+        )}
+        {/* Label<input name="label" value={formData.label} onChange={formAddData} className='border border-black'/>
+            placeHolder<input name="placeHolder" value={formData.placeHolder} onChange={formAddData} className='border border-black'/> */}
+      </Modal>
+      <Modal
+        open={delModal}
+        onCancel={delModalClose}
+        onOk={() => {
+          deleteFormData();
+          delModalClose();
+        }}
+      >
+        Data Deleted Successfully
+      </Modal></div>
+      <div>
+       FormName <input name="name" value={formName.name} onChange={handleFormname} className="border border-black"/><Button type="primary" onClick={formBackend}>Add Form</Button>
+      </div>
     </div>
   );
 }
