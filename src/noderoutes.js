@@ -44,7 +44,7 @@ function Noderoutes() {
     )}
     <Route exact path="/registerUser" element={<RegisterUser/>}></Route>
     <Route exact path="/dyanamicform" element={<Dyanamicform userId={userId}  userRole={userRole}/>}></Route>
-    <Route exact path="/formDataDisplay" element={<FormDataDisplay/>}></Route>
+    <Route exact path="/formDataDisplay" element={<FormDataDisplay userId={userId}/>}></Route>
   </Routes>
 </BrowserRouter>
     {

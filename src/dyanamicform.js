@@ -10,7 +10,7 @@ function Dyanamicform(props) {
   const [formName,setFormName]=useState({
     name:""
   });
-  const [formIndex,setFormIndex]=useState(0)
+  // const [formIndex,setFormIndex]=useState(0)
   const [editAddOption,setEditAddOption]=useState();
   const [editDataIndex,setEditDataIndex]=useState();
   const [delDataIndex,setDelDataIndex]=useState();
@@ -22,7 +22,6 @@ function Dyanamicform(props) {
     label: "",
     placeHolder: "",
   });
-  const [updateData,setUpdateData]=useState()
   const input = [
     { name: "text" },
     { name: "select" },
@@ -42,23 +41,24 @@ function Dyanamicform(props) {
   const delModalClose = () => {
     setDelModal(false);
   };
+  
 
   const handleSubmit = (name) => {
     console.log(name, "id");
     if (name === "text") {
-      const outputArr = [...inputType, { type: "text",label:"",placeHolder:""}];
+      const outputArr = [...inputType, { type: "text",label:"",placeHolder:"",value:""}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "select") {
-      const outputArr = [...inputType, { type: "select",label:"",arr:["option1","option2"]}];
+      const outputArr = [...inputType, { type: "select",label:"",value:"",arr:["option1","option2"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "radio") {
-      const outputArr = [...inputType, { type: "radio",label:"",arr:["male","female"]}];
+      const outputArr = [...inputType, { type: "radio",label:"",value:"",arr:["male","female"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "checkbox") {
-      const outputArr = [...inputType, { type: "checkbox",label:"",arr:["Yes","No"]}];
+      const outputArr = [...inputType, { type: "checkbox",label:"",value:"",arr:["Yes","No"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     }
@@ -197,17 +197,17 @@ function Dyanamicform(props) {
 //   console.log(inputType[editDataIndex],'senthilkumar')
 // }
 const handleFormname=(e)=>{
-  const{name,value}=e.target;
+  const{value}=e.target;
   setFormName(value);
 }
 console.log(formName,"formName");
 const formBackend=()=>{
   let time=new Date();
-  setFormIndex(formIndex+1);
-  console.log(formIndex,"indexesss")
+  // setFormIndex(formIndex+1);
+  // console.log(formIndex,"indexesss")
   const user=props.userId.firstName;
   console.log(user,"123456")
-  axios.post("http://localhost:5000/form-post",{index:formIndex,formName:formName,formData:inputType,formUserName:user,formTime:time})
+  axios.post("http://localhost:5000/form-post",{formName:formName,formData:inputType,formUserName:user,formTime:time})
   .then((res)=>{
     console.log(res,"data get succesfully");
   })
@@ -216,6 +216,14 @@ const formBackend=()=>{
 // console.log(time.getDate())
 
 }
+const delteOptions=(i)=>{
+  const arr=[...editAddOption.arr];
+  arr.splice(i,1);
+  setEditAddOption((prevType) => ({ ...prevType, arr: arr }));
+  
+
+}
+
 
   return (
     <div className="flex justify-between">
@@ -258,7 +266,12 @@ const formBackend=()=>{
               </div>
             ) : item.type === "checkbox" ? (<div>
 
-              <label>{item?.label}</label><input type="checkbox" className=" border border-black p-2" />
+              <label>{item?.label}</label>
+              {item.arr?.map((values,i)=>{
+                return(
+                  <div key={i} className="flex-row"><label>{values}</label><input type="checkbox" className=" border border-black p-2" /></div>
+                )
+              })}
               </div>
             ) : null}
             <Button
@@ -325,7 +338,13 @@ const formBackend=()=>{
             />
             {editAddOption&&editAddOption.arr.map((item,i)=>{
              
-              return(<div key={i}>{item}</div>)
+              return(<div key={i} className="flex"><input type="text" value={item} onChange={(e)=>{
+                const {value}=e.target;
+                const arr=[...editAddOption.arr]
+                arr[i]=value;
+                setEditAddOption((prevType) => ({ ...prevType, arr: arr }));
+
+              }}/><Button onClick={()=>delteOptions(i)}>Delete</Button> </div>)
             })}
             <Button type="primary" onClick={()=>addOptions()}>Add</Button>
           </div>
@@ -342,7 +361,19 @@ const formBackend=()=>{
         }}
       >
         Data Deleted Successfully
-      </Modal></div>
+      </Modal>
+      {/* <Modal
+      open={optionModal}
+      onCancel={optionCancelModal}
+      onOk={()=>{
+        optionCancelModal();
+        editOption();
+
+      }}
+      >
+
+      </Modal> */}
+      </div>
       <div>
        FormName <input name="name" value={formName.name} onChange={handleFormname} className="border border-black"/><Button type="primary" onClick={formBackend}>Add Form</Button>
       </div>
