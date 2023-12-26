@@ -61,12 +61,17 @@ function LoginValidation(props) {
       .post(`http://localhost:5000/login`,{...userDetail})
       .then((res) => {
         if(res.status===200){
-          console.log(res.data.token,"werrtyui")
-          props.setTokenData(res.data.token)
-         props.setIsLogIn(true);
+          // console.log(res.data.token,"werrtyui")
+          localStorage.setItem('myData',JSON.stringify( res.data.data));
+          localStorage.setItem('token',res.data.token)
+          localStorage.setItem('role',res.data.data.role)
+          // const Data=JSON.parse(localStorage.getItem('myData'))
+          // const Token=JSON.parse(localStorage.getItem('token'))
+          // props.setTokenData(Token)
+        //  props.setIsLogIn(true);
         props.setUserId(res.data.data);
-        props.setUserRole(res.data.data.role)
-        console.log(res.data,"qwertysiva")
+        // props.setUserRole(Data.role)
+        // console.log(res.data,"qwertysiva")
         // props.setRole(res.data.data.role);
         navigate("/userData")
         }else{

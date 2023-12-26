@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Button, Modal } from "antd";
 import axios from "axios";
+import Navbarroutes from "./navbarroutes";
 
 function Dyanamicform(props) {
   const [inputType, setInputType] = useState([]);
@@ -10,18 +11,15 @@ function Dyanamicform(props) {
   const [formName,setFormName]=useState({
     name:""
   });
-  // const [formIndex,setFormIndex]=useState(0)
   const [editAddOption,setEditAddOption]=useState();
   const [editDataIndex,setEditDataIndex]=useState();
   const [delDataIndex,setDelDataIndex]=useState();
-  // const [formIndex, setFormIndex] = useState({
-  //   editDataIndex: 0,
-  //   delDataIndex: "",
-  // });
+ 
   const [formData, setFormData] = useState({
     label: "",
     placeHolder: "",
   });
+  
   const input = [
     { name: "text" },
     { name: "select" },
@@ -50,21 +48,19 @@ function Dyanamicform(props) {
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "select") {
-      const outputArr = [...inputType, { type: "select",label:"",value:"",arr:["option1","option2"]}];
+      const outputArr = [...inputType, { type: "select",label:"",value:"",option:["option1","option2"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "radio") {
-      const outputArr = [...inputType, { type: "radio",label:"",value:"",arr:["male","female"]}];
+      const outputArr = [...inputType, { type: "radio",label:"",value:"",option:["male","female"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "checkbox") {
-      const outputArr = [...inputType, { type: "checkbox",label:"",value:"",arr:["Yes","No"]}];
+      const outputArr = [...inputType, { type: "checkbox",label:"",value:"",option:["Yes","No"]}];
       setInputType(outputArr);
       // setEditAddOption(outputArr);
     }
   };
-  console.log(props.userId.firstName,"props")
-  // console.log(editModal, "qwedsa");
   console.log(editAddOption, "modal");
   const formAddData = (e) => {
     const { name, value } = e.target;
@@ -76,7 +72,6 @@ function Dyanamicform(props) {
   let Data=[];
   
   const addOptions=()=>{
-    console.log(editAddOption,"first")
     // setEditAddOption([inputType[formIndex.editDataIndex]])
     // console.log(editAddOption[0].arr,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
     // console.log(inputType,editDataIndex,"qwerty")
@@ -91,22 +86,11 @@ function Dyanamicform(props) {
     
     // setEditAddOption(Data);
     // console.log(editAddOption,"DataEdited")
-    const updatedOptions = [...editAddOption.arr, "New Option"];
-  setEditAddOption((prevType) => ({ ...prevType, arr: updatedOptions }));
-  console.log(editAddOption,"addoptions")
-
-
-    
-     
-    // inputType[formIndex.editDataIndex].arr=[...Data];
-    // console.log(inputType[formIndex.editDataIndex]?.arr,"dddddddddddddddaaaaaaa")
-    // console.log(inputType,"qwertyuio")
-    // 
-
+    const updatedOptions = [...editAddOption.option, "New Option"];
+  setEditAddOption((prevType) => ({ ...prevType, option: updatedOptions }));
+    // inputType[formIndex.editDataIndex].arr=[...Data]; 
   }
   console.log(Data,"mmmmmmmmmm")
-  // console.log(Data,"zzzzzzssssss")
-  // console.log(updateData,"zxcvvbnm,mnbvcxcvbnbvcx")
  
   const updateFormData = () => {
     // console.log(Data, "hole data");
@@ -116,7 +100,7 @@ function Dyanamicform(props) {
     // setUpdateData(editAddOption[editDataIndex]?.arr)
 
     // console.log(editAddOption[0]?.arr,"vengatesan")
-    inputType[editDataIndex]={type:typeData,label:formData.label,placeHolder:formData.placeHolder,arr:editAddOption.arr}
+    inputType[editDataIndex]={type:typeData,label:formData.label,placeHolder:formData.placeHolder,option:editAddOption.option}
     setFormData({
       label: "",
       placeHolder: "",
@@ -177,12 +161,8 @@ function Dyanamicform(props) {
   };
   const deleteFormData = () => {
     const DeletArr = [...inputType];
-    // console.log(formIndex?.delDataIndex,"index of del")
-    // inputType[formIndex.editDataIndex]=inputType.splice(formIndex.editDataIndex,1);
     if (!delDataIndex.length)
       DeletArr.splice(delDataIndex, 1);
-
-    // console.log("jiii",DeletArr)
     setInputType([...DeletArr]);
   };
  
@@ -202,31 +182,28 @@ const handleFormname=(e)=>{
 }
 console.log(formName,"formName");
 const formBackend=()=>{
-  let time=new Date();
-  // setFormIndex(formIndex+1);
-  // console.log(formIndex,"indexesss")
-  const user=props.userId.firstName;
-  console.log(user,"123456")
-  axios.post("http://localhost:5000/form-post",{formName:formName,formData:inputType,formUserName:user,formTime:time})
+  axios.post("http://localhost:5000/create-form",{formName:formName,formData:inputType},{headers:{Authorization:`Bearer ${props.tokenData}`}})
   .then((res)=>{
-    console.log(res,"data get succesfully");
+    console.log("data get succesfully");
   })
-  .catch((err)=>console.log(err,"err"))
+  .catch((err)=>console.log("err"))
   
-// console.log(time.getDate())
+
 
 }
 const delteOptions=(i)=>{
-  const arr=[...editAddOption.arr];
+  const arr=[...editAddOption.option];
   arr.splice(i,1);
-  setEditAddOption((prevType) => ({ ...prevType, arr: arr }));
+  setEditAddOption((prevType) => ({ ...prevType, option: arr }));
   
 
 }
 
 
   return (
-    <div className="flex justify-between">
+    <div>
+     <Navbarroutes setUserId={props}/>
+     <div className="flex justify-between">
       <div>
       {input?.map((item, index) => {
         return (
@@ -251,14 +228,14 @@ const delteOptions=(i)=>{
             </div>
             ) : item.type === "select" ? (<div>
               <label>{item?.label}</label><select className=" border border-black p-2" >
-                {item.arr?.map((values,i)=>{
+                {item.option?.map((values,i)=>{
                   return(<option key={i}>{values?values:null}</option>)
                 })}
               </select>
               </div>
             ) : item.type === "radio" ? (<div>
               <label>{item?.label}</label>
-              {item.arr?.map((values,i)=>{
+              {item.option?.map((values,i)=>{
                 return(
                   <div key={i} className="flex-row"><label>{values}</label><input type="radio" className=" border border-black p-2" /></div>
                 )
@@ -267,7 +244,7 @@ const delteOptions=(i)=>{
             ) : item.type === "checkbox" ? (<div>
 
               <label>{item?.label}</label>
-              {item.arr?.map((values,i)=>{
+              {item.option?.map((values,i)=>{
                 return(
                   <div key={i} className="flex-row"><label>{values}</label><input type="checkbox" className=" border border-black p-2" /></div>
                 )
@@ -278,13 +255,11 @@ const delteOptions=(i)=>{
               type="primary"
               onClick={() => {
                 modelOpen();
-                // console.log(index,"indexes")
                 setEditDataIndex(index);
-                // console.log(editDataIndex,'senthilkumar')
-                // console.log(item,"sivaprakash")
                 setTypeData(item.type)
                 // setOptions(item);
                 setEditAddOption(item);
+                setFormData({label:item.label,placeHolder:item.placeHolder})
               }}
             >
               Edit
@@ -308,7 +283,7 @@ const delteOptions=(i)=>{
           modelClose();
           updateFormData()
         }}
-      >{console.log(typeData,editAddOption,editDataIndex,"nnnnnnn")}
+      >
         {typeData === "text" ? (
           <div>
             {console.log('llkkk')}
@@ -336,13 +311,13 @@ const delteOptions=(i)=>{
               onChange={formAddData}
               className="border border-black"
             />
-            {editAddOption&&editAddOption.arr.map((item,i)=>{
+            {editAddOption&&editAddOption.option.map((item,i)=>{
              
               return(<div key={i} className="flex"><input type="text" value={item} onChange={(e)=>{
                 const {value}=e.target;
-                const arr=[...editAddOption.arr]
+                const arr=[...editAddOption.option]
                 arr[i]=value;
-                setEditAddOption((prevType) => ({ ...prevType, arr: arr }));
+                setEditAddOption((prevType) => ({ ...prevType, option: arr }));
 
               }}/><Button onClick={()=>delteOptions(i)}>Delete</Button> </div>)
             })}
@@ -362,21 +337,11 @@ const delteOptions=(i)=>{
       >
         Data Deleted Successfully
       </Modal>
-      {/* <Modal
-      open={optionModal}
-      onCancel={optionCancelModal}
-      onOk={()=>{
-        optionCancelModal();
-        editOption();
-
-      }}
-      >
-
-      </Modal> */}
       </div>
       <div>
        FormName <input name="name" value={formName.name} onChange={handleFormname} className="border border-black"/><Button type="primary" onClick={formBackend}>Add Form</Button>
       </div>
+    </div>
     </div>
   );
 }

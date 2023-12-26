@@ -4,6 +4,9 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Button, Modal } from "antd";
 import axios from "axios";
+import { json, useNavigate } from 'react-router-dom';
+import ViewResponseData from './viewResponse';
+import Navbarroutes from './navbarroutes';
 
 function FormDataDisplay(props) {
     const [formData1,setFormData1]=useState([])
@@ -29,7 +32,7 @@ function FormDataDisplay(props) {
     const [submitId,setSubmitId]=useState();
   
     useEffect((res)=>{
-        axios.get("http://localhost:5000/form-get")
+        axios.get("http://localhost:5000/get-userForm",{headers:{Authorization:`Bearer ${props.tokenData}`}})
         .then(res=>{
             const {data}=res?.data||{};
             if(data.length){
@@ -39,12 +42,22 @@ function FormDataDisplay(props) {
         .catch(err=>console.log(err))
 
     },[])
+    // useEffect(() => {
+    //   localStorage.setItem('viewIndex', JSON.stringify(viewDataIndex));
+    // }, [viewDataIndex]);
+    // const storedViewIndex = localStorage.getItem('viewIndex');
+    //  const storedData =JSON.parse(localStorage.getItem('myData'));
+    //  const newData = storedData ? `${currentData}, ${myData}` : myData;
+    console.log(props,"formData")
+
+
     const input = [
       { name: "text" },
       { name: "select" },
       { name: "checkbox" },
       { name: "radio" },
     ];
+    const navigate=useNavigate();
     const editModalOpen=()=>{
       setEditModal(true);
     }
@@ -84,7 +97,7 @@ function FormDataDisplay(props) {
     const submitCancel=()=>{
       setSubmitResponsemodal(false);
     }
-    console.log(props.userId.firstName,"props")
+    // console.log(storedData.userId.firstName,"props")
     const deleteFormData=()=>{
       const Arr=[...formData1]
       console.log(Arr,"qwerty")
@@ -99,9 +112,11 @@ function FormDataDisplay(props) {
       console.log(Arr,"llllll")
     }
     console.log(formData1,"vimal123")
+    // console.log(props,"sssss")
     const deleteform=(data)=>{
       const id=data._id;
-      axios.delete(`http://localhost:5000/form-delete/${id}`)
+      console.log(props.tokenData,"gggggg")
+      axios.delete(`http://localhost:5000/delete-userForm/${id}`,{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
         console.log(res,"delete Data")
       })
@@ -117,25 +132,33 @@ function FormDataDisplay(props) {
       setEditFormData(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "select") {
-      const outputArr = [...editFormData, { type: "select",label:"",value:"",arr:["option1","option2"]}];
+      const outputArr = [...editFormData, { type: "select",label:"",value:"",option:["option1","option2"]}];
       setEditFormData(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "radio") {
-      const outputArr = [...editFormData, { type: "radio",label:"",value:"",arr:["male","female"]}];
+      const outputArr = [...editFormData, { type: "radio",label:"",value:"",option:["male","female"]}];
       setEditFormData(outputArr);
       // setEditAddOption(outputArr);
     } else if (name === "checkbox") {
-      const outputArr = [...editFormData, { type: "checkbox",label:"",value:"",arr:["Yes","No"]}];
+      const outputArr = [...editFormData, { type: "checkbox",label:"",value:"",option:["Yes","No"]}];
       setEditFormData(outputArr);
       // setEditAddOption(outputArr);
     }
   };
+  const setView=(data)=>{
+    console.log(data._id,"llllllll")
+    if (typeof Storage !== 'undefined') {
+      localStorage.setItem('id', data._id);
+    } else {
+      console.error('localStorage is not supported in this browser');
+    }
+  }
 
     const [columnDefs]=useState([
         {field:"formName"},
         {field:"formData"},
-        {field:"formUserName"},
-        {field:"formTime"},
+        {field:"createdBy"},
+        {field:"createdAt"},
         { field: "ViewData",
         cellRenderer: ({ data }) => {
           return (
@@ -189,6 +212,16 @@ function FormDataDisplay(props) {
         )
       }
     },
+    {field:"View Response",
+    cellRenderer:({data})=>{
+      return(
+        <Button
+        type="primary"
+        onClick={()=>{setView(data);navigate("/viewResponse")}}>View Response</Button>
+      )
+
+    }
+  },
     { field: "Delete",
     cellRenderer: ({ data }) => {
       return (
@@ -219,54 +252,65 @@ function FormDataDisplay(props) {
     }));
     }
     const addOptions=()=>{
-      const updatedOptions = [...editModalData.arr, "New Option"];
-  setEditModalData((prevType) => ({ ...prevType, arr: updatedOptions }));
+      const updatedOptions = [...editModalData.option, "New Option"];
+  setEditModalData((prevType) => ({ ...prevType, option: updatedOptions }));
 
     }
     const upadateForm=()=>{
-      editFormData[editIndex]={type:editModalData?.type,label:userEditValue.label,placeHolder:userEditValue.placeHolder,arr:editModalData.arr}
+      editFormData[editIndex]={type:editModalData?.type,label:userEditValue.label,placeHolder:userEditValue.placeHolder,option:editModalData.option}
     setUserEditValue({
       label: "",
       placeHolder: "",
     });
     }
-    console.log(agData,"lkjhgffdsaa");
+    console.log(editFormData,"lkjhgffdsaa");
     const patchMethod=()=>{
       const id=agData._id;
-      axios.patch(`http://localhost:5000/form-patch/${id}`,{formName:agData.formName,formData:editFormData,formTime:agData.formTime,formUserName:agData.formUserName})
+      axios.patch(`http://localhost:5000/update-userForm/${id}`,{formName:agData.formName,formData:editFormData},{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
+        console.log(formData1,"zzzzzzzzzzzzzzzzzzzzzzzzz")
+        setFormData1((prev)=>{
+          const index=prev.findIndex(i=>i._id===res.data.data._id)
+          if(index>-1)
+          formData1[index]=res.data.data;
+        return [...formData1];
+        })
+        console.log(formData1,"zzzzzzzzzzzzzzzzzzzzzzzzz")
         console.log(res,"Updated Data")
+        console.log(res.data.data._id,"sivaooooo")
       })
       .catch(err=>{
         console.log(err,"error message")
       })
     }
-    const ss=()=>{
-      patchMethod();
-      console.log('aaaaa',editFormData)
-      // setFormData1((prev)=>({...prev,editFormData}))
-      console.log('fffffff',formData1)
-      editModalCancel();
-    }
+    console.log(editFormData,"sreeeeeeeee");
+    // const ss=()=>{
+    //   console.log('aaaaa',editFormData)
+    //   // patchMethod();
+      
+    //   // // setFormData1((prev)=>({...prev,editFormData}))
+    //   // console.log('fffffff',formData1)
+    //   editModalCancel();
+    // }
     const deleteData=()=>{
       const arr=[...editFormData]
       console.log(delIndex,"deleteddddddd")
-      if (!delIndex.length)
+      if (delIndex>-1)
       arr.splice(delIndex,1)
       setEditFormData([...arr])
 
     }
     const delteOptions=(i)=>{
-      const arr=[...editModalData.arr];
+      const arr=[...editModalData.option];
       arr.splice(i,1);
-      setEditModalData((prevType) => ({ ...prevType, arr: arr }));
+      setEditModalData((prevType) => ({ ...prevType, option: arr }));
       
     
     }
     // console.log(submitId?.submitResponse,"zzzzzzzzzz")
     const responseBackend=()=>{
-      // console.log(submitResponseData,"siva")
-      // console.log(submitId,"sivaprakash")
+      console.log(submitResponseData,"siva")
+      console.log(submitId._id,"sivaprakash")
       // const arr=[...submitId.submitResponse,...submitResponseData]
       // console.log(arr,"vimalooo")
       
@@ -274,19 +318,22 @@ function FormDataDisplay(props) {
       // setSubmitId((prev)=>({...prev,}))
       let time=new Date();
       const obj={
-        userName:props.userId.firstName,
+        createdBy:props.userId.firstName,
         submitedTime:time,
-        value:{...submitResponseData}
+        submittedForm:submitResponseData
       }
       console.log(obj,"abi")
-      axios.patch(`http://localhost:5000/submitFormResponse-patch/${submitId._id}`,{submitResponse:[obj]})
+      axios.patch(`http://localhost:5000/update-userFormResponse/${submitId._id}`,{submissions:[obj]},{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
         console.log("data posted",res)
       })
       .catch(err=>console.log("Error occur",err))
     }
+    
   return (
     <div>
+     <Navbarroutes setUserId={props}/>
+      {console.log(formData1,"trtrtrtrtrtr")}
         <div
         className="ag-theme-alpine"
         style={{ height: "600px", width: "100%" }}
@@ -299,7 +346,10 @@ function FormDataDisplay(props) {
         onCancel={editModalCancel}
         onOk={() => {
           // deleteFormData();
-          ss()
+          // ss()
+          patchMethod();
+          console.log('aaaaa',editFormData)
+          editModalCancel();
         }}>
           {
             input?.map((item, index) => {
@@ -328,14 +378,14 @@ function FormDataDisplay(props) {
                   ):item.type==="select"?(
                     <div>
                        <label>{item?.label}</label><select className=" border border-black p-2" >
-                {item.arr?.map((values,i)=>{
+                {item.option?.map((values,i)=>{
                   return(<option key={i}>{values?values:null}</option>)
                 })}
               </select>
                     </div>
                   ):item.type === "radio" ? (<div>
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                       return(
                         <div key={i} className="flex-row"><label>{values}</label><input type="radio" className=" border border-black p-2" /></div>
                       )
@@ -344,7 +394,7 @@ function FormDataDisplay(props) {
                   ) : item.type === "checkbox" ? (<div>
       
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                 return(
                   <div key={i} className="flex-row"><label>{values}</label><input type="checkbox" className=" border border-black p-2" /></div>
                 )
@@ -353,7 +403,7 @@ function FormDataDisplay(props) {
                   ) : null
 
                 }
-                <Button type='primary' onClick={()=>{seteditIndex(index);setEditModalData(item);editInModal()}}>Edit</Button>
+                <Button type='primary' onClick={()=>{seteditIndex(index);setEditModalData(item);editInModal();setUserEditValue({label:item.label,placeHolder:item.placeHolder})}}>Edit</Button>
                 <Button type="primary" onClick={()=>{setDelIndex(index);deleteData();console.log(index,"sathisshhhhhhhhhhh")}}>Delete</Button>
               </div>)
             })
@@ -408,13 +458,13 @@ function FormDataDisplay(props) {
               onChange={formAddData}
               className="border border-black"
             />
-            {editModalData&&editModalData.arr.map((item,i)=>{
+            {editModalData&&editModalData.option?.map((item,i)=>{
              
               return(<div key={i}><input type="text" value={item} onChange={(e)=>{
                 const {value}=e.target;
-                const arr=[...editModalData.arr]
+                const arr=[...editModalData.option]
                 arr[i]=value;
-                setEditModalData((prevType) => ({ ...prevType, arr: arr }));
+                setEditModalData((prevType) => ({ ...prevType, option: arr }));
 
               }}className=" border border-black p-2" /><Button onClick={()=>delteOptions(i)}>Delete</Button></div>)
             })}
@@ -441,14 +491,14 @@ function FormDataDisplay(props) {
                   ):item.type==="select"?(
                     <div>
                        <label>{item?.label}</label><select className=" border border-black p-2" >
-                {item.arr?.map((values,i)=>{
+                {item.option?.map((values,i)=>{
                   return(<option key={i}>{values?values:null}</option>)
                 })}
               </select>
                     </div>
                   ):item.type === "radio" ? (<div>
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                       return(
                         <div key={i} className="flex-row"><label>{values}</label><input type="radio" className=" border border-black p-2" /></div>
                       )
@@ -457,7 +507,7 @@ function FormDataDisplay(props) {
                   ) : item.type === "checkbox" ? (<div>
       
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                 return(
                   <div key={i} className="flex-row"><label>{values}</label><input type="checkbox" className=" border border-black p-2" /></div>
                 )
@@ -507,14 +557,14 @@ function FormDataDisplay(props) {
                           return arr
                          });
                        }}>
-                {item.arr?.map((values,i)=>{
+                {item.option?.map((values,i)=>{
                   return(<option key={i}>{values?values:null}</option>)
                 })}
               </select>
                     </div>
                   ):item.type === "radio" ? (<div>
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                       return(
                         <div key={i} className="flex-row"><label>{values}</label><input type="radio" className=" border border-black p-2" value={item?.value}onChange={(e)=>{
                           setSubmitResponseData((prev) => { 
@@ -529,7 +579,7 @@ function FormDataDisplay(props) {
                   ) : item.type === "checkbox" ? (<div>
       
                     <label>{item?.label}</label>
-                    {item.arr?.map((values,i)=>{
+                    {item.option?.map((values,i)=>{
                 return(
                   <div key={i} className="flex-row"><label>{values}</label><input type="checkbox" className=" border border-black p-2" value={item?.value} onChange={(e)=>{
                     setSubmitResponseData((prev) => { 
