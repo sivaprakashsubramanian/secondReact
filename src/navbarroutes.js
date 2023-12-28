@@ -1,31 +1,33 @@
-import React,{useEffect, useState} from 'react'
-// import { Navigate } from 'react-router-dom'
-import {BrowserRouter , Router,Route,Link,Routes,Navigate,useNavigate} from 'react-router-dom'
-import Dyanamicform from './dyanamicform'
-import FormDataDisplay from './formDataDisplay'
-import ViewResponseData from './viewResponse'
+import React,{ useState} from 'react'
+
+import {useNavigate} from 'react-router-dom'
+
 // import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
+// import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
+// import MenuItem from '@mui/material/MenuItem';
+// import AdbIcon from '@mui/icons-material/Adb';
 import axios from 'axios'
 import {  Modal } from "antd";
+import { Block } from '@mui/icons-material';
 // import Dyanamicform from './dyanamicform'
 // import FormDataDisplay from './formDataDisplay'
 
 
 function Navbarroutes(props) {
-  const [user,setUser]=useState();
+  const [user,setUser]=useState(JSON?.parse(localStorage?.getItem('myData')));
+  // const [user,setUser]=useState(props?.setUserId?.userId);
+  const [token,setToken]=useState(localStorage.getItem('token'));
+  const [userDetail,setUserDetail]=useState();
   const [inputValue, setInputValue] = useState({
     firstName: "",
     lastName: "",
@@ -57,7 +59,7 @@ function Navbarroutes(props) {
     setEditUserData(true);
     // const arr=userInfo.filter(i=>i._id=props.setUserId.userId._id)
     // setInputValue(arr)
-    handleUpdate(props.setUserId.userId)
+    handleUpdate(user)
     setAnchorElUser(null);
   };
   const userModalClose=()=>{
@@ -88,20 +90,28 @@ const handleUpdate = (t) => {
   });
 };
 const checkData = () => {
-  
+  console.log(user,"token")
   const id = props?.setUserId?.userId?._id;
   console.log(props?.setUserId?.userId?._id,"qqqqqqqq")
+  console.log(inputValue,"input")
   axios
-    .patch(`http://localhost:5000/update-userData/${id}`, { ...inputValue },{headers:{Authorization:`Bearer ${props.setToken}`}})
+    .patch(`http://localhost:5000/update-userData/${id}`, { ...inputValue },{headers:{Authorization:`Bearer ${token}`}})
     .then((response) => {
+      console.log(response,"tttttttttt")
+      const a=response?.data?.data.filter(i=>i._id===id)
+      const b= localStorage.getItem('myData');
+     
+      console.log(a,'aaaaaaaaa')
+      localStorage.setItem('myData',JSON.stringify(a? a[0]:b));
+      const c=JSON.parse(localStorage.getItem('myData'))
+      // console.log(c?.a[0],"abina")
+      setUser(c)
       
-      // console.log(response,"asdfghjkl")
-      // setInputValue(response?.data?.data)
-      // localStorage.setItem('myData',response?.data?.data);
     })
     .catch(err=>{
       console.log("error",err)
     });
+
   setInputValue({
     firstName: "",
     lastName: "",
@@ -115,9 +125,11 @@ const checkData = () => {
 
   
 };
+
 const navigate=useNavigate();
   return (
     <div>
+      {console.log(user,"use")}
       <Modal
       open={editUserData}
       onCancel={userModalClose}
@@ -125,21 +137,10 @@ const navigate=useNavigate();
         userModalClose()
       }}
       footer={[
-        <Button key="back" onClick={()=>{userModalClose()
-          // setInputValue({
-          //   firstName: "",
-          //   lastName: "",
-          //   email: "",
-          //   gender: "",
-          //   age: "",
-          //   active: "",
-          //   password: "",
-          //   role: "",
-          // });
-          }}>
+        <Button key="back" onClick={()=>{userModalClose()}}>
           cancel
         </Button>,
-       <Button className="p-1 m-2 border border-black"
+       <Button  className="p-1 m-2 border border-black"
        onClick={() => {
           checkData() ;
          userModalClose()
@@ -327,11 +328,11 @@ const navigate=useNavigate();
             <span className='m-2'>{props?.setUserId?.userId?.role}</span>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={props.setUserId.userId.firstName} src="/static/images/avatar/2.jpg" />
+                <Avatar alt={props?.setUserId?.userId?.firstName} src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: '45px' }}
+              sx={{ mt: '45px', display:'block' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{

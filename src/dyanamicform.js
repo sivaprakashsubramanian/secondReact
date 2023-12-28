@@ -28,7 +28,7 @@ function Dyanamicform(props) {
   ];
   const modelOpen = () => {
     setEditModal(true);
-    // console.log(editModal,"aaassssaasss")
+    
   };
   const modelClose = () => {
     setEditModal(false);
@@ -42,7 +42,7 @@ function Dyanamicform(props) {
   
 
   const handleSubmit = (name) => {
-    console.log(name, "id");
+   
     if (name === "text") {
       const outputArr = [...inputType, { type: "text",label:"",placeHolder:"",value:""}];
       setInputType(outputArr);
@@ -61,7 +61,7 @@ function Dyanamicform(props) {
       // setEditAddOption(outputArr);
     }
   };
-  console.log(editAddOption, "modal");
+  
   const formAddData = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -72,34 +72,13 @@ function Dyanamicform(props) {
   let Data=[];
   
   const addOptions=()=>{
-    // setEditAddOption([inputType[formIndex.editDataIndex]])
-    // console.log(editAddOption[0].arr,"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
-    // console.log(inputType,editDataIndex,"qwerty")
-    // Data=[...inputType]
-    // console.log(Data[editDataIndex],"1")
-    // Data[editDataIndex]=[Data[editDataIndex],Data[editDataIndex].arr.push("new option")]
-    // console.log(data)
-    // console.log(Data,"Data")
-    // setEditAddOption(Data);
-    // editAddOption[0].arr=[...Data]
-   // editAddOption[editDataIndex]=Data
-    
-    // setEditAddOption(Data);
-    // console.log(editAddOption,"DataEdited")
     const updatedOptions = [...editAddOption.option, "New Option"];
   setEditAddOption((prevType) => ({ ...prevType, option: updatedOptions }));
     // inputType[formIndex.editDataIndex].arr=[...Data]; 
   }
-  console.log(Data,"mmmmmmmmmm")
+ 
  
   const updateFormData = () => {
-    // console.log(Data, "hole data");
-    // inputType[formIndex.editDataIndex].arr=[...Data];
-    // console.log(inputType[formIndex.editDataIndex].arr,"aaaaaaaaaaaaaaaaaaaaaa")
-    // console.log(editAddOption,"editaddoptions")
-    // setUpdateData(editAddOption[editDataIndex]?.arr)
-
-    // console.log(editAddOption[0]?.arr,"vengatesan")
     inputType[editDataIndex]={type:typeData,label:formData.label,placeHolder:formData.placeHolder,option:editAddOption.option}
     setFormData({
       label: "",
@@ -166,9 +145,9 @@ function Dyanamicform(props) {
     setInputType([...DeletArr]);
   };
  
-  console.log(delDataIndex, "modal1111");
-  // console.log(inputType[editDataIndex]?.arr,"llllllllllllllllllll")
-  console.log(inputType[editDataIndex],'senthilkumar')
+  
+  
+  
 // const setEditData=()=>{
 //   // console.log(formIndex,'kk')
 //   console.log(inputType[editDataIndex],"madhuuu")
@@ -180,16 +159,19 @@ const handleFormname=(e)=>{
   const{value}=e.target;
   setFormName(value);
 }
-console.log(formName,"formName");
+
 const formBackend=()=>{
-  axios.post("http://localhost:5000/create-form",{formName:formName,formData:inputType},{headers:{Authorization:`Bearer ${props.tokenData}`}})
+  axios.post("http://localhost:5000/create-userForm",{formName:formName,formData:inputType},{headers:{Authorization:`Bearer ${props.tokenData}`}})
   .then((res)=>{
-    console.log("data get succesfully");
+   
+    if (res?.data?.message) alert(res?.data?.message);
+  
   })
-  .catch((err)=>console.log("err"))
+  .catch((err)=>{if (err?.response?.data?.message) alert(err?.response?.data?.message);})
   
 
-
+setFormName({name:""})
+setInputType([]);
 }
 const delteOptions=(i)=>{
   const arr=[...editAddOption.option];
@@ -211,7 +193,7 @@ const delteOptions=(i)=>{
             {item?.name}
             <button
               className="p-2 border border-black"
-              onClick={() => {console.log(item,"krishana");handleSubmit(item.name);}}
+              onClick={() => {handleSubmit(item.name);}}
             >
               Add
             </button>
@@ -286,7 +268,7 @@ const delteOptions=(i)=>{
       >
         {typeData === "text" ? (
           <div>
-            {console.log('llkkk')}
+            
             Label
             <input
               name="label"
@@ -303,7 +285,7 @@ const delteOptions=(i)=>{
             />
           </div>
         ) : (
-          <div>{ console.log(editAddOption,'ll')}
+          <div>
             Label
             <input
               name="label"

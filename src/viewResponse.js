@@ -15,7 +15,7 @@ function ViewResponseData(props) {
     useEffect(()=>{
         axios.get("http://localhost:5000/get-userForm",{headers:{Authorization:`Bearer ${props.tokenData}`}})
         .then((res)=>{
-            // console.log(res.data);
+            
             const {data}=res?.data||{};
             if(data.length)setViewResData(data)
         
@@ -25,7 +25,7 @@ function ViewResponseData(props) {
     const view=localStorage.getItem('id');
     // const data=localStorage.getItem('myData');
 //  const viewId=JSON.parse(view);
-//  console.log(view,"ppppppppppppppppppppp")
+
 const openModal=()=>{
   setViewValueModal(true);
 }
@@ -33,28 +33,18 @@ const closeModal=()=>{
   setViewValueModal(false);
 
 }
-    // const arr=viewResData
-    console.log(viewResData,"hello")
-    // console.log(props.viewIndex,"props")
     const arr=viewResData?.filter(x=>x._id===view)
-    console.log(arr&&arr[0]?.submissions,"aaaaaa")
+    
     const [columnDefs]=useState([
         {field:"submitedTime"},
         {field:"createdBy"},
         {field:"View",cellRenderer:({data})=>{
           return(<div><Button onClick={()=>{openModal();setSubmitData(data.submittedForm
-            );console.log(data,"datafrom")}}>View</Button></div>)
+            )}}>View</Button></div>)
 
         }}
-        // {field:"createdAt"},
-        // {field:"View",cellrenderer:({data})=>{
-        //   return(<div><Button onClick={()=>openModal()}>View</Button></div>)
-
-        // }}
+      
     ])
-    // console.log(arr&&arr[0].submissions[2],"ggggggggg")
-    console.log(arr,'arr')
-    console.log(submittedData,"siva")
   return (
     <div>
       <Navbarroutes setUserId={props}/>

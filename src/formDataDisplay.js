@@ -42,13 +42,6 @@ function FormDataDisplay(props) {
         .catch(err=>console.log(err))
 
     },[])
-    // useEffect(() => {
-    //   localStorage.setItem('viewIndex', JSON.stringify(viewDataIndex));
-    // }, [viewDataIndex]);
-    // const storedViewIndex = localStorage.getItem('viewIndex');
-    //  const storedData =JSON.parse(localStorage.getItem('myData'));
-    //  const newData = storedData ? `${currentData}, ${myData}` : myData;
-    console.log(props,"formData")
 
 
     const input = [
@@ -97,36 +90,37 @@ function FormDataDisplay(props) {
     const submitCancel=()=>{
       setSubmitResponsemodal(false);
     }
-    // console.log(storedData.userId.firstName,"props")
+   
     const deleteFormData=()=>{
       const Arr=[...formData1]
-      console.log(Arr,"qwerty")
+    
       const index=Arr.findIndex(x=>x._id===delFormData)
-      console.log(index,"kkkk")
+     
       if(index>-1)
       {
         Arr.splice(index,1);
         setFormData1(Arr);
         
       }
-      console.log(Arr,"llllll")
+      
     }
-    console.log(formData1,"vimal123")
-    // console.log(props,"sssss")
+   
     const deleteform=(data)=>{
       const id=data._id;
-      console.log(props.tokenData,"gggggg")
+    
       axios.delete(`http://localhost:5000/delete-userForm/${id}`,{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
-        console.log(res,"delete Data")
+        if (res?.data?.message) alert(res?.data?.message);
+       
       })
       .catch(err=>{
-        console.log(err,"error message")
+        if (err?.response?.data?.message) alert(err?.response?.data?.message);
+        
       })
 
     }
     const handleSubmit = (name) => {
-    console.log(name, "id");
+  
     if (name === "text") {
       const outputArr = [...editFormData, { type: "text",label:"",placeHolder:"",value:""}];
       setEditFormData(outputArr);
@@ -146,7 +140,7 @@ function FormDataDisplay(props) {
     }
   };
   const setView=(data)=>{
-    console.log(data._id,"llllllll")
+   
     if (typeof Storage !== 'undefined') {
       localStorage.setItem('id', data._id);
     } else {
@@ -165,11 +159,11 @@ function FormDataDisplay(props) {
             <Button
               type="primary"
               onClick={() => {
-                // findIndex()
+                
                 setViewData(data.formData)
                 viewModalOpen()
                 
-                // setData(data);
+               
               }}
             >
             View
@@ -183,13 +177,12 @@ function FormDataDisplay(props) {
           <Button
             type="primary"
             onClick={() => {
-              // findIndex();
-              console.log(data.formData,"hiiiii")
+              
               setEditFormData(data.formData);
               editModalOpen();
               setAgData(data)
               
-              // setData(data);
+              
             }}
           >
             Edit
@@ -229,13 +222,9 @@ function FormDataDisplay(props) {
           type="delete"
           className='bg-red-500 text-white'
           onClick={() => {
-            // findIndex();
-            console.log(data._id,"hiiiii")
             setDelFormData(data._id);
             delModalOpen();
             deleteform(data);
-           
-            // setData(data);
           }}
         >
           Delete
@@ -263,38 +252,25 @@ function FormDataDisplay(props) {
       placeHolder: "",
     });
     }
-    console.log(editFormData,"lkjhgffdsaa");
+    
     const patchMethod=()=>{
       const id=agData._id;
       axios.patch(`http://localhost:5000/update-userForm/${id}`,{formName:agData.formName,formData:editFormData},{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
-        console.log(formData1,"zzzzzzzzzzzzzzzzzzzzzzzzz")
+        if (res?.data?.message) alert(res?.data?.message);
         setFormData1((prev)=>{
           const index=prev.findIndex(i=>i._id===res.data.data._id)
           if(index>-1)
           formData1[index]=res.data.data;
         return [...formData1];
         })
-        console.log(formData1,"zzzzzzzzzzzzzzzzzzzzzzzzz")
-        console.log(res,"Updated Data")
-        console.log(res.data.data._id,"sivaooooo")
       })
       .catch(err=>{
-        console.log(err,"error message")
+        if (err?.response?.data?.message) alert(err?.response?.data?.message);
       })
     }
-    console.log(editFormData,"sreeeeeeeee");
-    // const ss=()=>{
-    //   console.log('aaaaa',editFormData)
-    //   // patchMethod();
-      
-    //   // // setFormData1((prev)=>({...prev,editFormData}))
-    //   // console.log('fffffff',formData1)
-    //   editModalCancel();
-    // }
     const deleteData=()=>{
       const arr=[...editFormData]
-      console.log(delIndex,"deleteddddddd")
       if (delIndex>-1)
       arr.splice(delIndex,1)
       setEditFormData([...arr])
@@ -307,33 +283,26 @@ function FormDataDisplay(props) {
       
     
     }
-    // console.log(submitId?.submitResponse,"zzzzzzzzzz")
     const responseBackend=()=>{
-      console.log(submitResponseData,"siva")
-      console.log(submitId._id,"sivaprakash")
-      // const arr=[...submitId.submitResponse,...submitResponseData]
-      // console.log(arr,"vimalooo")
-      
-
-      // setSubmitId((prev)=>({...prev,}))
       let time=new Date();
       const obj={
         createdBy:props.userId.firstName,
         submitedTime:time,
         submittedForm:submitResponseData
       }
-      console.log(obj,"abi")
       axios.patch(`http://localhost:5000/update-userFormResponse/${submitId._id}`,{submissions:[obj]},{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res)=>{
-        console.log("data posted",res)
+        if (res?.data?.message) alert(res?.data?.message);
+     
       })
-      .catch(err=>console.log("Error occur",err))
+      .catch(err=>{
+        if (err?.response?.data?.message) alert(err?.response?.data?.message);
+       })
     }
     
   return (
     <div>
      <Navbarroutes setUserId={props}/>
-      {console.log(formData1,"trtrtrtrtrtr")}
         <div
         className="ag-theme-alpine"
         style={{ height: "600px", width: "100%" }}
@@ -348,7 +317,6 @@ function FormDataDisplay(props) {
           // deleteFormData();
           // ss()
           patchMethod();
-          console.log('aaaaa',editFormData)
           editModalCancel();
         }}>
           {
@@ -358,7 +326,7 @@ function FormDataDisplay(props) {
                   {item?.name}
                   <button
                     className="p-2 border border-black"
-                    onClick={() => {console.log(item,"krishana");handleSubmit(item.name);}}
+                    onClick={() => {handleSubmit(item.name);}}
                   >
                     Add
                   </button>
@@ -404,7 +372,7 @@ function FormDataDisplay(props) {
 
                 }
                 <Button type='primary' onClick={()=>{seteditIndex(index);setEditModalData(item);editInModal();setUserEditValue({label:item.label,placeHolder:item.placeHolder})}}>Edit</Button>
-                <Button type="primary" onClick={()=>{setDelIndex(index);deleteData();console.log(index,"sathisshhhhhhhhhhh")}}>Delete</Button>
+                <Button type="primary" onClick={()=>{setDelIndex(index);deleteData()}}>Delete</Button>
               </div>)
             })
           }
@@ -433,7 +401,7 @@ function FormDataDisplay(props) {
         }}>
           {editModalData?.type === "text" ? (
           <div>
-            {console.log('llkkk')}
+            
             Label
             <input
               name="label"
@@ -450,7 +418,7 @@ function FormDataDisplay(props) {
             />
           </div>
         ) : (
-          <div>{ console.log(editModalData,'ll')}
+          <div>
             Label
             <input
               name="label"
@@ -529,7 +497,7 @@ function FormDataDisplay(props) {
           submitCancel();
          responseBackend();
          }}>
-          {console.log(submitResponseData,"ushhuuuuuuuuuuuuu")}
+          
            {
             submitResponseData?.map((item,index)=>{
               return(<div key={index} className='flex'>
@@ -538,14 +506,13 @@ function FormDataDisplay(props) {
                     <div>
                        <label>{item?.label}</label>
                       <input className=" border border-black p-2"  placeholder={item?.placeHolder} value={item?.value} onChange={(e)=>{
-                        // const {value}=e.target;
-                        // console.log(value,"valaueeeeee")
+                        
                         setSubmitResponseData((prev) => { 
                           const arr=[...prev]
                           arr[index].value=e.target.value;
                           return arr
                          });
-                        // console.log(setSubmitData,"zzzzzzzzzzzzzzzz")
+                        
                       }}/>
                     </div>
                   ):item.type==="select"?(

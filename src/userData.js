@@ -4,11 +4,8 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import axios from "axios";
 import { Button, Modal } from "antd";
-import { Navigate, useNavigate } from "react-router-dom";
-import LoginValidation from "./loginValidation";
-import Dyanamicform from "./dyanamicform";
+import {  useNavigate } from "react-router-dom";
 import Navbarroutes from "./navbarroutes";
-// import Navbarroutes from "./navbarroutes";
 
  function UserData(props) {
   const navigate=useNavigate();
@@ -46,12 +43,6 @@ import Navbarroutes from "./navbarroutes";
       .catch((err) => console.log(err));
     // setUser([...props.user])
   }, []);
-  // useEffect(() => {
-  //   localStorage.setItem('myData', JSON.stringify(props));
-  // }, [props]);
-  // const storedData = localStorage.getItem('myData');
-  // console.log( JSON.parse(storedData),"local storage")
-  // const userInfo=JSON.parse(storedData);
   const openModal=()=>{
     setEditUserModal(true);
   }
@@ -64,7 +55,7 @@ import Navbarroutes from "./navbarroutes";
   const userModalClose=()=>{
     setUserModal(false);
   }
-  // console.log(role,'kkhhkkhhkk')
+  
   const [columnDefs] = useState([
     { field: "firstName" },
     { field: "lastName" },
@@ -103,13 +94,12 @@ import Navbarroutes from "./navbarroutes";
   ]);
 
   const handleSubmit = () => {
-    // if(!inputValue)
-    // return;
+   
     axios
       .post("http://localhost:5000/create-userData", { ...inputValue })
       .then((res) => {
-        // console.log(res,"as")
-        console.log(inputValue.active, "wwwwwwwww");
+        
+        
         setUser((prev) => {
           const arr = [...prev];
           arr.push({
@@ -136,31 +126,34 @@ import Navbarroutes from "./navbarroutes";
           role: "",
         });
 
-        if (res.data.message) alert(res.data.message);
+        if (res.data.message) alert(res?.data?.message);
       })
       .catch(
         (err) => {
-          // console.log(err.response.data.message,"aaaaaaaaa")
-          if (err.response.data.message) alert(err.response.data.message);
+         
+          if (err?.response?.data?.message) alert(err?.response?.data?.message);
         }
 
-        // console.log(err.response.data.message)
+        
       );
   };
 
   const handleDelete = (t) => {
-    // console.log(user, "qqwwfdvxbwf");
+ 
     const id = t._id;
     axios
       .delete(`http://localhost:5000/delete-userData/${id}`,{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((res) => {
-        setUser(res.data.data)
+        setUser(res?.data?.data)
 
-        if (res.data.message) alert(res.data.message);
+        if (res?.data?.message) alert(res?.data?.message);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        if (err?.response?.data?.message) alert(err?.response?.data?.message);
+       
+      });
   };
-  // console.log(user, "qwertyuiop");
+  
   // getting id
   const getID = () => {
     const maxID = user.reduce(
@@ -185,14 +178,11 @@ import Navbarroutes from "./navbarroutes";
   };
   // set the values
   const checkData = () => {
-    // console.log(data?._id,"vijay")
+    
     const id = data?._id;
-    console.log(props.tokenData,"qqqqqqqq")
     axios
       .patch(`http://localhost:5000/update-userData/${id}`, { ...inputValue },{headers:{Authorization:`Bearer ${props.tokenData}`}})
       .then((response) => {
-        
-        console.log(response,"asdfghjkl")
         // setUser((prev) => {
         //   const index = prev.findIndex((item) => item._id === id);
         //   if (index > -1) {
@@ -225,27 +215,23 @@ import Navbarroutes from "./navbarroutes";
 
     setUpdateBtn(false);
   };
-   console.log(props, "daatat");
+   
   const filterUser = user?.filter((item) => item._id != props.userId._id);
-  // console.log(user, "hiii");
+ 
   const profile=user?.filter((item)=>item._id===props.userId._id)
-  // console.log(userInfo,"idddd");
-  // const filterRole=user?.filter((item)=>item._id===props.userId)
-  // console.log(filterRole[0].role,"role")
   const prop=JSON.stringify(props);
   const userProp=JSON.parse(prop);
-  console.log(userProp,"prop")
 
   return (
     <div>
-      {/* {console.log(inputValue,"abiiiiii")} */}
+     
       <Navbarroutes setUserId={userProp} setToken={props.tokenData}/>
      
       <div style={{display:"flex",justifyContent:"space-between"}}>
         <div><Button type="primary" onClick={userModalOpen}>AddData</Button></div>
       <Modal
       open={userModal}
-      // onCancel={userModalClose}
+      onCancel={userModalClose}
       onOk={()=>{
         userModalClose()
       }}
@@ -377,18 +363,18 @@ import Navbarroutes from "./navbarroutes";
       </Modal>
       <div>
         {/* <button onClick={()=>navigate("/dyanamicform")}>Dyanamic Form</button>
-        <button onClick={()=>navigate("/formDataDisplay")}>Dyanamic Form Data</button> */}
-        {/* {console.log(profile[0]?._id,"sathish")} */}
-        {/* <p>User:{profile?profile[0]?.firstName:"hello"}</p>
+        <button onClick={()=>navigate("/formDataDisplay")}>Dyanamic Form Data</button> 
+         {console.log(profile[0]?._id,"sathish")} 
+         <p>User:{profile?profile[0]?.firstName:"hello"}</p>
         <p>UserRole:{profile?profile[0]?.role:"hello"}</p> */}
        <div className="flex">
         <p><Button type="primary" onClick={()=>{navigate("/");localStorage.removeItem("myData");localStorage.removeItem("token");localStorage.removeItem("role");localStorage.removeItem("id")}}>LogOut</Button></p>
-        <p><Button  type="primary" onClick={()=>{handleUpdate(profile[0]);setUpdateBtn(true);setData(profile[0]) ;console.log(data,"vimal");openModal()}}>edit</Button></p>
+        <p><Button  type="primary" onClick={()=>{handleUpdate(profile[0]);setUpdateBtn(true);setData(profile[0]) ;openModal()}}>edit</Button></p>
         </div>
       </div>
       </div>
       
-        {/* {console.log("use", user)} */}
+        
         {/* {
              
             user.length?user.map((value,index)=>(
